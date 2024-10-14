@@ -1,0 +1,80 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-3.5.1.min.js"></script>
+<script src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.19.3/jquery.validate.min.js"></script>
+<script src="https://ajax.aspnetcdn.com/ajax/jquery.validate.unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></script>
+
+@model Customer.UI.Models.AddOrUpdateCustomerViewModel
+
+@if (Model is null)
+{
+    <p>
+        No customer is available with this Id. Please check again.
+    </p>
+}
+else
+{
+    <h3>@ViewBag.Title</h3>
+
+    <form method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="mt-3">
+            <label class="form-label">Customer Id</label>
+            <input type="text" class="form-control" asp-for="Id" readonly />            
+        </div>
+        <div class="mt-3">
+            <label class="form-label">First Name</label>
+            <input type="text" class="form-control" asp-for="FirstName" />
+            <span asp-validation-for="FirstName" class="text-danger"></span>
+        </div>
+        <div class="mt-3">
+            <label class="form-label">Last Name</label>
+            <input type="text" class="form-control" asp-for="LastName" />
+            <span asp-validation-for="LastName" class="text-danger"></span>
+        </div>
+        <div class="mt-3">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" asp-for="Email" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+        <div class="mt-3">
+            <label class="form-label">Phone Number</label>
+            <input type="number" class="form-control" asp-for="PhoneNumber" />
+            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+        </div>
+        <div class="mt-3">
+            <label class="form-label">Address</label>
+            <input type="text" class="form-control" asp-for="Address" />
+            <span asp-validation-for="Address" class="text-danger"></span>
+        </div>
+        <div class="mt-3">
+            <label class="form-label">City</label>
+            <input type="text" class="form-control" asp-for="City" />
+            <span asp-validation-for="City" class="text-danger"></span>
+        </div>
+        <div class="mt-3">
+            <label class="form-label">Postcode</label>
+            <input type="text" class="form-control" asp-for="Postcode" />
+            <span asp-validation-for="Postcode" class="text-danger"></span>
+        </div>
+        <div class="mt-3">
+            <label class="form-label">Country</label>
+            <input type="text" class="form-control" asp-for="Country" />
+            <span asp-validation-for="Country" class="text-danger"></span>
+        </div>
+        <div class="mt-3">
+            <input type="checkbox" class="form-check-input" id="IsActive" asp-for="IsActive" />
+            <label class="form-check-label" for="IsActive">Active Customer</label>
+        </div>
+        <div class="mt-3">
+            <button type="submit" class="btn btn-primary">Save</button>
+            <button type="submit" class="btn btn-secondary ms-3" asp-action="List" asp-controller="Customer" formmethod="get">Cancel</button>
+            <button type="submit" class="btn btn-danger ms-3" asp-action="Delete" asp-controller="Customer">Delete</button>
+        </div>
+    </form>
+}

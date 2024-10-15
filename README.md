@@ -11,6 +11,8 @@ The backend uses a **SQL Server** database for storing customer information. The
 ### API Features
 - **RESTful API**: Built with ASP.NET Web API to manage customer data.
 - **Search and Filter**: Search and filter customers by name, email, and other attributes in Web API.
+- **Pagination**: Filter the customer records based on number of records in each page.
+- **Sorting**: Can be sorted on Name by Ascending/Descending
 
 ### UI and UX
 - **Responsive Design**: Uses Bootstrap for a mobile-friendly layout.

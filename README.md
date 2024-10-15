@@ -63,6 +63,10 @@ Open the solution in Visual Studio
     <add name="DefaultConnection" connectionString="Server=<server-name>;Initial Catalog=CustomerDB;Integrated Security=True" providerName="System.Data.SqlClient"/>
   </connectionStrings>
 
+- Initial Customer Database migration has been created but may need to be run if required.
+    - Add-Migration "Initial Customer Database"
+    - Update-Database "Updating Customer Database"
+
 ### 4. Run the solution
 - Press F5 to run the solution.
 - Both the API and WebForms are set as startup projects.

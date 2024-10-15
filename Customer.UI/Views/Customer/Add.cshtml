@@ -23,6 +23,8 @@
         <label class="form-label">First Name</label>
         <input type="text" class="form-control" asp-for="FirstName" />
         <span asp-validation-for="FirstName" class="text-danger"></span>
+        @* @Html.EditorFor(model => model.FirstName, new { htmlAttributes = new { @class = "form-control" } })
+        @Html.ValidationMessageFor(model => model.FirstName, "", new { @class = "text-danger" }) *@
     </div>
     <div class="mt-3">
         <label class="form-label">Last Name</label>
@@ -65,6 +67,6 @@
     </div>    
     <div class="mt-3">
         <button type="submit" class="btn btn-primary">Save</button>
-        <button type="submit" class="btn btn-secondary ms-3" asp-action="List" asp-controller="Customer" formmethod="get">Cancel</button>
+        <button type="submit" class="btn btn-secondary ms-3" asp-action="List" asp-controller="Customer" formmethod="get" formnovalidate>Cancel</button>
     </div>
 </form>

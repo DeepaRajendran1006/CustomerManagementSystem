@@ -22,9 +22,6 @@ namespace Customer.UI.Models
         [MaxLength(10, ErrorMessage = "Phone number should be 10 digits")]
         [MinLength(10, ErrorMessage = "Phone number should be 10 digits")]
         [Phone(ErrorMessage = "Phone number is not in a valid format")]
-        //[RegularExpression(@"^\d{10}$", ErrorMessage = "Phone Number must be numeric.")]
-        //[StringLength(10, ErrorMessage = "Phone Number cannot be more than 10 digits.")]
-        //[MaxLength(10, ErrorMessage = "Phonumber should be 10 digits")]
         public required string PhoneNumber { get; set; }
 
         [MaxLength(100, ErrorMessage = "Address can be maximum of 100 characters")]

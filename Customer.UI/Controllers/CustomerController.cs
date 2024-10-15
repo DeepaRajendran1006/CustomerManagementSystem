@@ -23,6 +23,7 @@ namespace Customer.UI.Controllers
         [HttpGet]
         public async Task<IActionResult> List()
         {
+            ViewBag.ErrorMessage = string.Empty;
             List<CustomerDto> customers = new List<CustomerDto>();
             try
             {
@@ -37,7 +38,8 @@ namespace Customer.UI.Controllers
             }
             catch (Exception)
             {
-                //return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+                ViewBag.ErrorMessage = "An error occurred while processing your request.";
+                return View();
             }
 
             return View(customers);
@@ -61,34 +63,57 @@ namespace Customer.UI.Controllers
         [HttpPost]
         public async Task<IActionResult> Add(AddOrUpdateCustomerViewModel customerViewModel)
         {
+            ViewBag.ErrorMessage = string.Empty;
+            List<CustomerDto> customers = new List<CustomerDto>();
             try
             {
                 var clientFactory = httpClientFactory.CreateClient();
 
-                // Form a request message to add a new customer
-                var httpRequestMessage = new HttpRequestMessage()
-                {
-                    Method = HttpMethod.Post,
-                    RequestUri = new Uri("https://localhost:7269/api/Customer"),
-                    Content = new StringContent(JsonSerializer.Serialize(customerViewModel), Encoding.UTF8, "application/json")
-                };
-
-                // Call the API to add a customer
-                var responseMessage = await clientFactory.SendAsync(httpRequestMessage);
+                // Get customer list from API
+                var responseMessage = await clientFactory.GetAsync("https://localhost:7269/api/Customer");
                 responseMessage.EnsureSuccessStatusCode();
 
-                // If successfull, redirect to List page
-                var response = await responseMessage.Content.ReadFromJsonAsync<CustomerDto>();
+                var customer_list = await responseMessage.Content.ReadFromJsonAsync<IEnumerable<CustomerDto>>() ?? Enumerable.Empty<CustomerDto>();
+                customers.AddRange(customer_list);
 
-                if (response != null)
+                // Check if the existing customer list contains a customer with the same email and phone number
+                bool customerExists = customers.Any(c =>
+                                                (c.PhoneNumber == customerViewModel.PhoneNumber) ||
+                                                string.Equals(c.Email, customerViewModel.Email, StringComparison.OrdinalIgnoreCase));
+
+                if (!customerExists)
                 {
-                    return RedirectToAction("List", "Customer");
+                    // Form a request message to add a new customer
+                    var httpRequestMessage = new HttpRequestMessage()
+                    {
+                        Method = HttpMethod.Post,
+                        RequestUri = new Uri("https://localhost:7269/api/Customer"),
+                        Content = new StringContent(JsonSerializer.Serialize(customerViewModel), Encoding.UTF8, "application/json")
+                    };
+
+                    // Call the API to add a customer
+                    responseMessage = await clientFactory.SendAsync(httpRequestMessage);
+                    responseMessage.EnsureSuccessStatusCode();
+
+                    // If successfull, redirect to List page
+                    var response = await responseMessage.Content.ReadFromJsonAsync<CustomerDto>();
+
+                    if (response != null)
+                    {
+                        return RedirectToAction("List", "Customer");
+                    }
+                }
+                else
+                {
+                    ViewBag.ErrorMessage = "Customer already exists with this email or phone number.";
                 }
             }
             catch (Exception)
             {
-                //return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+                ViewBag.ErrorMessage = "An error occurred while processing your request.";
+                return View();
             }
+
             return View();            
         }
 
@@ -100,6 +125,7 @@ namespace Customer.UI.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(Guid customerId)
         {
+            ViewBag.Title = string.Empty;
             var client = httpClientFactory.CreateClient();
 
             // Get the selected customer data
@@ -136,33 +162,56 @@ namespace Customer.UI.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(AddOrUpdateCustomerViewModel customerViewModel)
         {
+            List<CustomerDto> customers = new List<CustomerDto>();
+            ViewBag.ErrorMessage = string.Empty;
             try
             {
                 var client = httpClientFactory.CreateClient();
 
-                // Form the request message to update the customer data
-                var httpRequestMessage = new HttpRequestMessage
+                // Get customer list from API
+                var responseMessage = await client.GetAsync("https://localhost:7269/api/Customer");
+                responseMessage.EnsureSuccessStatusCode();
+
+                var customer_list = await responseMessage.Content.ReadFromJsonAsync<IEnumerable<CustomerDto>>() ?? Enumerable.Empty<CustomerDto>();
+                customers.AddRange(customer_list);
+
+                // Check if the existing customer list contains a customer with the same email and phone number
+                bool customerExists = customers.Any(c =>
+                                                (c.Id != customerViewModel.Id) &&
+                                                ((c.PhoneNumber == customerViewModel.PhoneNumber) ||
+                                                string.Equals(c.Email, customerViewModel.Email, StringComparison.OrdinalIgnoreCase)));
+
+                if (!customerExists)
                 {
-                    Method = HttpMethod.Put,
-                    RequestUri = new Uri($"https://localhost:7269/api/Customer/{customerViewModel.Id}"),
-                    Content = new StringContent(JsonSerializer.Serialize(customerViewModel), Encoding.UTF8, "application/json")
-                };
+                    // Form the request message to update the customer data
+                    var httpRequestMessage = new HttpRequestMessage
+                    {
+                        Method = HttpMethod.Put,
+                        RequestUri = new Uri($"https://localhost:7269/api/Customer/{customerViewModel.Id}"),
+                        Content = new StringContent(JsonSerializer.Serialize(customerViewModel), Encoding.UTF8, "application/json")
+                    };
 
-                // Call the API to update a customer
-                var httpResponseMessage = await client.SendAsync(httpRequestMessage);
-                httpResponseMessage.EnsureSuccessStatusCode();
+                    // Call the API to update a customer
+                    var httpResponseMessage = await client.SendAsync(httpRequestMessage);
+                    httpResponseMessage.EnsureSuccessStatusCode();
 
-                var response = await httpResponseMessage.Content.ReadFromJsonAsync<CustomerDto>();
+                    var response = await httpResponseMessage.Content.ReadFromJsonAsync<CustomerDto>();
 
-                // if updated successfully, redirect to list page
-                if (response != null)
+                    // if updated successfully, redirect to list page
+                    if (response != null)
+                    {
+                        return RedirectToAction("List", "Customer");
+                    }
+                }
+                else
                 {
-                    return RedirectToAction("List", "Customer");
+                    ViewBag.ErrorMessage = "Customer already exists with this email or phone number.";
                 }
             }
             catch (Exception)
             {
-                //return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+                ViewBag.ErrorMessage = "An error occurred while processing your request.";
+                return View();
             }
 
             return View(customerViewModel);
@@ -176,6 +225,7 @@ namespace Customer.UI.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(CustomerDto customer)
         {
+            ViewBag.ErrorMessage = string.Empty;
             try
             {
                 var client = httpClientFactory.CreateClient();
@@ -189,7 +239,7 @@ namespace Customer.UI.Controllers
             }
             catch (Exception)
             {
-                //return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+                ViewBag.ErrorMessage = "An error occurred while processing your request.";
             }
             return View(customer);
         }

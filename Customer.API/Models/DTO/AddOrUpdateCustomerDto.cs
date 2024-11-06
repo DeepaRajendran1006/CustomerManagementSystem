@@ -5,11 +5,11 @@ namespace Customer.API.Models.DTO
     public class AddOrUpdateCustomerDto
     {
         [Required]
-        [MaxLength(100, ErrorMessage = "First Name can be maximum of 50 characters")]
+        [MaxLength(50, ErrorMessage = "First Name can be maximum of 50 characters")]
         public required string FirstName { get; set; }
 
         [Required]
-        [MaxLength(100, ErrorMessage = "Last Name can be maximum of 50 characters")]
+        [MaxLength(50, ErrorMessage = "Last Name can be maximum of 50 characters")]
         public required string LastName { get; set; }
 
         [Required]
